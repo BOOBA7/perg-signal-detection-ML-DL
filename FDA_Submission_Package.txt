@@ -1,0 +1,103 @@
+==================================================
+FDA SUBMISSION PACKAGE – SIMULATED
+Software as a Medical Device (SaMD)
+Title: ML-Based PERG Signal Classifier
+Author: Anis Boubala
+Date: July 2025
+==================================================
+
+1. DEVICE OVERVIEW
+-------------------
+Device Name: PERG Signal ML Classifier
+Type: Software as a Medical Device (SaMD)
+Indication for Use:
+  "To assist ophthalmologists in detecting pattern electroretinogram (PERG) signal alterations potentially associated with retinal or optic nerve diseases."
+
+Device Description:
+  This software classifies electrophysiological PERG signals (RE_1 and LE_1) using classical ML models trained on manually extracted features. The output is a binary decision: "normal PERG" vs "altered PERG".
+
+2. INTENDED USE
+-------------------
+- Patient Population: Adults aged 18–90 undergoing PERG testing
+- Use Environment: Ophthalmology clinics
+- User: Ophthalmologist or trained technician
+- Output: Binary prediction (Healthy / Altered PERG)
+- Limitations: This is not a diagnostic tool; clinical judgment is required.
+
+3. MODEL DESCRIPTION
+---------------------
+Algorithms Used:
+  - Logistic Regression
+  - Random Forest (best performer)
+  - XGBoost
+  - Decision Tree
+
+Data Source: Public dataset (PERG-IOBA, PhysioNet)
+Data Size: 240 labeled samples, signal channels (RE_1, LE_1), metadata (age, sex)
+Labeling: Manual diagnosis mapping from metadata
+
+Model Training:
+  - Training on balanced data (50/50), evaluated on:
+      - Real-world prevalence test set (2%)
+      - Balanced test set (50%)
+      - Stratified 5-fold Cross Validation
+
+Performance Summary:
+  - Best Balanced Acc: 70.5%
+  - AUC-ROC (Random Forest): 0.768
+  - Recall (cross-validated mean): 69.8%
+
+4. SOFTWARE DESCRIPTION
+-------------------------
+Software Language: Python 3.11  
+Dependencies:
+  - pandas, numpy, scikit-learn, xgboost, scipy, matplotlib, tqdm
+
+Execution Environment: Jupyter Notebook / CLI
+
+Version Control: GitHub (https://github.com/your-user/perg-signal-detection-ml)
+
+5. GOOD MACHINE LEARNING PRACTICES (GMLP)
+-------------------------------------------
+✓ Data Representativeness: Included balanced and real-world tests  
+✓ Model Explainability: Feature-based models only  
+✓ Risk Mitigation: Sensitivity tuned ≥ 0.8  
+✓ Human-in-the-loop: For validation only  
+✓ Version Control & Reproducibility: Git-tracked, requirements.txt provided  
+✓ Labeling Source: Based on diagnosis from clinical metadata
+
+6. VALIDATION & TESTING
+-------------------------
+- Internal validation: train/test + cross-validation
+- No external validation (to be conducted in future)
+- Confusion matrices and ROC curves documented
+- Model thresholds selected based on desired sensitivity (≥80%)
+
+7. RISK ANALYSIS (ISO 14971 inspired)
+--------------------------------------
+Potential Risks:
+  - False Negative: missed detection of pathological PERG
+  - False Positive: over-referral or unnecessary worry
+  - Overfitting due to small dataset
+
+Controls in Place:
+  - Balanced training
+  - Realistic test evaluation
+  - Predefined threshold tuning
+
+8. LIMITATIONS
+----------------
+- Not tested on external population
+- No FDA clearance
+- Not integrated with clinical workflow
+- Dataset limited in size and diversity
+
+9. FUTURE WORK
+----------------
+- External validation with clinical datasets
+- Deployment in a user interface
+- Consideration of deep learning with raw signal input
+
+10. DISCLAIMER
+---------------
+This submission package is for **educational and demonstration purposes only** and is **not intended** for regulatory use.
