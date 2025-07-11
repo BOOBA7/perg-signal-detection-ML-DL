@@ -89,3 +89,19 @@ Chaque modèle a été évalué sur un test équilibré avec 50 % de cas positif
 
 📍 Exemple - Random Forest
 TP = 27 | FN = 6 | TN = 23 | FP = 10
+
+
+---
+
+## 💡 Remarques bioinformatiques
+
+- 🔬 Le choix d’un **seuil adapté** est fondamental en santé : on privilégie une **haute sensibilité** (ne pas rater de patients malades).
+- 🌍 L’évaluation finale respecte aussi une **prévalence réaliste (~2%)**, permettant d’estimer les performances en conditions réelles.
+- 🎓 Ce projet n’a pas pour but d’atteindre un modèle cliniquement validé, mais de **montrer un pipeline rigoureux** en apprentissage supervisé appliqué à des données médicales.
+
+---
+
+## ✅ Conclusion
+
+Ce projet démontre l’applicabilité du machine learning pour l’analyse de signaux électrophysiologiques.  
+Il illustre un **cas d’usage complet** allant de l’extraction de features à l’évaluation rigoureuse, avec un focus sur les contraintes propres à la **bioinformatique médicale**.
