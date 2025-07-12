@@ -1,7 +1,19 @@
-pandas
-numpy
-matplotlib
-scikit-learn
-xgboost
-scipy
-tqdm
+# Core scientific stack
+pandas>=1.5
+numpy>=1.23
+scipy>=1.10
+scikit-learn>=1.3
+
+# Machine Learning models
+xgboost>=1.7
+tensorflow>=2.12
+
+# Visualization
+matplotlib>=3.7
+
+# Progress bar
+tqdm>=4.66
+
+# Jupyter/Colab compatibility
+ipython>=8.12
+notebook>=6.5
