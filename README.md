@@ -162,3 +162,8 @@ Veterinarian & Bioinformatics Enthusiast
 LinkedIn: [linkedin.com/in/anisboubala](https://www.linkedin.com/in/anisboubala)
 
 
+---
+
+## 🤝 Remerciements
+
+Ce projet a été conçu, structuré et documenté avec le soutien d'outils d’intelligence artificielle, notamment **ChatGPT** (OpenAI), pour la clarification bioinformatique, la rédaction technique et l’optimisation du code.
