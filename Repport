@@ -1,120 +1,151 @@
-# perg-signal-detection-ml
+# 🧠 PERG Signal Classifier – ML & Deep Learning
 
-# 🧠 Détection automatisée du signal PERG par Machine Learning & Deep Learning
+## 🔬 Détection automatisée du signal PERG (Pattern Electroretinogram)
 
-## 🎯 Objectif
+Ce projet simule un cas d’usage en **bioinformatique clinique** : l’analyse automatique de signaux PERG pour la détection d’anomalies associées à des atteintes précoces du nerf optique ou de la rétine (glaucome, neuropathies, etc.).
 
-Ce projet simule un cas réel en **bioinformatique médicale** en développant un pipeline complet pour la **détection d’altérations du signal PERG** (Pattern Electroretinogram), utilisé en ophtalmologie pour dépister des pathologies rétiniennes ou optiques.
-
-L’objectif est de comparer différentes approches (ML vs DL) pour déterminer leur efficacité en **dépistage assisté par l’IA**, tout en respectant les contraintes du domaine clinique (sensibilité élevée, traçabilité, explicabilité).
+L’objectif est de comparer des modèles **Machine Learning (ML)** et **Deep Learning (DL)** pour un usage de **triage assisté par IA**.  
+Il repose sur des signaux électrophysiologiques réels (dataset open source), en suivant les bonnes pratiques de traçabilité, reproductibilité, validation croisée et sélection de seuil.
 
 ---
 
 ## 🧪 Données utilisées
 
-- **Source** : [PERG-IOBA Dataset – PhysioNet](https://physionet.org/content/perg-ioba-dataset/1.0.0/)
-- **Contenu** :
-  - Signaux bruts des deux yeux (`RE_1`, `LE_1`)
-  - Métadonnées cliniques : âge, sexe, diagnostic
-- **Label binaire** (ground truth) :
-  - `0` : signal normal
-  - `1` : signal altéré (pathologie affectant le nerf optique ou la rétine)
+- **Source** : [PERG-IOBA – PhysioNet (2024)](https://physionet.org/content/perg-ioba-dataset/1.0.0/)
+- **Format** : 279 signaux bruts (RE_1, LE_1), 300 Hz, + métadonnées cliniques (âge, sexe, diagnostic)
+- **Ground truth** : Diagnostic binaire confirmé par ophtalmologiste (label = 0/1)
+- **Distribution** : prévalence pathologique ≈ 2 % (réaliste, déséquilibrée)
 
 ---
 
-## 🧬 Extraction de features (ML)
+## 🔎 Feature Engineering (ML)
 
-Pour les modèles de Machine Learning, les features sont extraits manuellement :
+Les modèles classiques utilisent des **features extraites manuellement** :
 
-- **Statistiques temporelles** : moyenne, écart-type, min, max, amplitude
-- **Moments** : asymétrie (skewness), aplatissement (kurtosis)
-- **Paramètres cliniques** : amplitude et latence de P50 et N95
-- **Analyse fréquentielle (FFT)** : fréquence dominante, énergie spectrale
-- **Démographie** : âge, sexe (encodé)
+- Statistiques de base : moyenne, min, max, std
+- Moments d’ordre supérieur : skewness, kurtosis
+- Analyse fréquentielle : FFT (magnitude moyenne, max, énergie spectrale)
+- Métadonnées : âge, sexe encodé
 
 ---
 
 ## ⚙️ Modélisation
 
-### 🔹 Machine Learning :
-- Algorithmes : Logistic Regression, Decision Tree, XGBoost, Random Forest
-- Features manuelles (FFT + stats cliniques + démographie)
-- Validation croisée (stratifiée, 5 folds)
-- Test sur :
-  - Jeu équilibré (50/50)
-  - Jeu à prévalence réaliste (~2%)
+### 🧠 Machine Learning :
+- Modèles testés : `Logistic Regression`, `Decision Tree`, `Random Forest`, `XGBoost`
+- Entrée : FFT + statistiques temporelles + métadonnées
+- Validation croisée stratifiée (5-fold)
+- Jeu de test :
+  - ✅ **Équilibré (50/50)** : évaluation robuste
+  - ✅ **Prévalence réelle (~2%)** : simulation réaliste
 
-### 🔸 Deep Learning :
-- Réseaux de neurones profonds (Keras / TensorFlow)
-- Entrée : concaténation RE_1 + LE_1 + métadonnées
-- Architecture dense (avec Dropout + BatchNorm)
-- Optimisation de seuil basée sur :
-  - 📈 **Indice de Youden**
-  - 🎯 **F1-score maximal**
-
----
-
-## 📈 Résultats comparés
-
-### ✅ Évaluation finale sur jeu équilibré (test 50/50)
-
-| Modèle              | AUC     | Sensibilité | Spécificité | F1-score | Accuracy |
-|---------------------|---------|-------------|-------------|----------|----------|
-| Random Forest (ML)  | **0.768** | 0.818       | 0.591       | 0.735    | **0.705** |
-| Deep Learning (DL)  | 0.660   | **0.928**   | 0.333       | **0.765**| 0.673    |
-
-🔍 **Analyse seuil F1-optimal pour DL** :  
-- Seuil : 0.45  
-- Recall : 92.9 %  
-- Spécificité : 33.3 %  
-- Accuracy : 67.3 %  
-- F1-score : 0.765
+### 🤖 Deep Learning :
+- Framework : TensorFlow / Keras
+- Architecture : fully connected (Dense → Dropout → BatchNorm)
+- Entrée :
+  - **Concaténation** des signaux RE_1 + LE_1 (via FFT)
+  - **Métadonnées** cliniques
+- Optimisation :
+  - `binary_crossentropy` + `AUC` en métrique
+  - Sélection du **seuil optimal** selon :
+    - 🎯 Sensibilité ≥ 0.8
+    - 📊 F1-score maximal
+    - 📈 Indice de Youden
 
 ---
 
-## 🩺 Interprétation clinique (bioinformatique)
+## 📈 Résultats (test équilibré)
 
-- 📌 En ophtalmologie, **une haute sensibilité est prioritaire** pour ne pas rater de patients pathologiques (faux négatifs).
-- Le modèle **deep learning** est donc adapté comme outil de **pré-tri automatisé**.
-- Le modèle **Random Forest** est mieux équilibré (AUC supérieur), plus robuste dans un contexte de screening général.
-- Ces résultats simulent un cas d’aide au diagnostic, **non destiné à remplacer l’opinion clinique**.
+| Modèle              | AUC     | Sensibilité | Spécificité | F1-score | Accuracy | Seuil |
+|---------------------|---------|-------------|-------------|----------|----------|--------|
+| 🔹 Random Forest     | **0.768** | 0.818       | 0.591       | 0.735    | **0.705** | 0.46   |
+| 🔸 Deep Learning     | 0.660   | **0.928**   | 0.333       | **0.765**| 0.673    | 0.45   |
 
----
+### 📊 Rapport DL (seuil = 0.45)
 
-## 📊 Analyse seuils multiples
-
-Une analyse fine des performances selon différents seuils montre que :
-
-- Seuil 0.45 maximise la **F1-score globale** (DL)  
-- Seuils plus bas (<0.3) maximisent la sensibilité mais induisent trop de faux positifs  
-- Le compromis Recall / Spécificité dépend du **cas d’usage clinique** :
-  - 🔬 Triage en amont : sensibilité haute
-  - 📉 Diagnostic assisté : AUC élevé + spécificité modérée
+- **Recall** : 92.9 %
+- **Spécificité** : 33.3 %
+- **Accuracy** : 67.3 %
+- **F1-score** : 0.765  
+- **Precision classe positive** : 65 %
 
 ---
 
-## 💡 Bonnes pratiques bioinformatiques
+## 🩺 Interprétation clinique
 
-- ✔️ **Explicabilité** pour les modèles ML (features cliniques interprétables)
-- ✔️ **Reproductibilité** via notebooks versionnés (GitHub)  
-- ✔️ **Validation croisée + test simulé réaliste**  
-- ✔️ **Analyse par seuils** avec rapport complet (ROC, confusion, F1, TPR, TNR)
-- ❗ **Pas d’intégration temps réel ni validation externe pour l’instant**
+| Critère                | DL Model (RE/LE + meta)       | ML Model (Random Forest)     |
+|------------------------|-------------------------------|-------------------------------|
+| 🔬 Sensibilité         | ✅ Excellente (triage efficace) | Moyenne à bonne               |
+| 📉 Spécificité         | Limite (faux positifs)         | Meilleure                     |
+| 🧠 Interprétabilité     | Faible (DL boîte noire)        | Bonne (features cliniques)    |
+| 🏥 Cas d’usage idéal   | Prétrisage automatique         | Dépistage général explicable  |
 
----
-
-## ✅ Conclusion
-
-Ce projet démontre la faisabilité d’un **pipeline bioinformatique rigoureux** appliqué à l’ophtalmologie.
-
-- Il met en œuvre à la fois **approche classique (ML)** et **deep learning**, en les évaluant dans un **cadre médical simulé**, fidèle aux contraintes cliniques.
-- Le modèle deep learning montre des performances utiles en **dépistage sensible**, tandis que le modèle Random Forest reste une **valeur sûre explicable**.
-- Ce travail sert de **preuve de concept** pour une future validation clinique.
+➡️ Le modèle DL est intéressant pour **maximiser la détection**, mais nécessite une **relecture humaine**.  
+➡️ Le modèle RF est **plus stable** et **équilibré** pour un usage plus conservateur.
 
 ---
 
-## 📁 Références
+## 📊 Analyse des seuils (DL)
 
-- [PERG-IOBA Dataset – PhysioNet](https://physionet.org/content/perg-ioba-dataset/1.0.0/)
-- FDA GMLP Principles (2021)
-- ISO 14971 – Risk management in medical devices
+```text
+Threshold  Sensibilité  Spécificité  F1-score   Accuracy
+--------------------------------------------------------
+0.10       1.0000       0.0000       0.7273     0.5714
+0.20       1.0000       0.0476       0.7368     0.5918
+0.30       0.9643       0.0476       0.7200     0.5714
+0.40       0.9643       0.1905       0.7500     0.6327
+0.45       0.9286       0.3333       0.7647     0.6735 ✅ (seuil retenu)
+0.60       0.1071       0.9524       0.1875     0.4694
+0.75+      0.0000       1.0000       0.0000     0.4286
+
+✅ Bonnes pratiques bioinformatiques
+
+| Pratique                                  | Implémentée |
+| ----------------------------------------- | ----------- |
+| 🧪 Validation croisée + test réaliste     | ✅           |
+| 📊 Rapport complet (ROC, confusion, F1)   | ✅           |
+| 📦 Fichiers reproductibles (.npy, .csv)   | ✅           |
+| ⚖️ Class weights pour déséquilibre        | ✅           |
+| 🔍 Analyse de seuils personnalisée        | ✅           |
+| 📁 Versioning (git) & logs d’entraînement | ✅           |
+| 📈 Visualisation TensorBoard              | ✅           |
+
+
+⚠️ Limites & perspectives
+
+
+❌ Pas de validation clinique externe
+
+❌ Pas d’intégration temps réel (EHR, API PERG)
+
+❌ Dataset limité en taille et diversité
+
+❗ Spécificité faible pour le DL (risque d’over-referral)
+
+🧭 Futures pistes :
+
+Validation multicentrique prospective
+
+Intégration interface web ou GUI clinique
+
+Entraînement avec modèles séquentiels (e.g. CNN, LSTM)
+
+Analyse des artefacts / qualité signal
+
+📁 Références
+
+
+PERG-IOBA – PhysioNet (2024)
+
+FDA SaMD GMLP Guidelines (2021)
+
+ISO 14971 – Risk Management in Medical Devices
+
+Good practices in ML for Biomedical Signal Analysis
+
+🛑 Avertissement
+
+
+Ce dépôt est un projet de simulation bioinformatique à visée éducative.
+Il ne constitue ni un dispositif médical certifié, ni un outil de diagnostic autonome.
+Toute décision clinique doit être validée par un professionnel de santé.
