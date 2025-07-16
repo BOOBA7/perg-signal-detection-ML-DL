@@ -12,142 +12,146 @@
 **Type**: Software as a Medical Device (SaMD)  
 
 **Indication for Use**:  
-> To assist ophthalmologists in identifying alterations in pattern electroretinogram (PERG) signals, potentially indicative of early-stage retinal or optic nerve dysfunction (e.g., glaucoma, dystrophies).
+> To assist ophthalmologists in identifying alterations in pattern electroretinogram (PERG) signals, potentially indicative of early-stage retinal or optic nerve dysfunction (e.g., glaucoma, inherited dystrophies, optic neuropathies).
 
 **Device Description**:  
-A software-based decision-support tool for binary classification of electrophysiological PERG signals (RE_1, LE_1), developed using:
-- Classical machine learning models trained on frequency-domain features and clinical metadata.
-- Deep learning architectures trained on concatenated FFT features and patient data.
+A software-based decision-support tool for binary classification of electrophysiological PERG signals, developed using:
+- Traditional machine learning models trained on FFT-derived features and basic clinical metadata.
+- A deep neural network trained on concatenated frequency-domain features and demographic variables.
 
 **Output**:  
-- Binary classification: `"Normal PERG"` or `"Altered PERG"`  
-- Probability score with optional threshold tuning
+- Binary prediction: `"Normal PERG"` or `"Altered PERG"`  
+- Associated probability score with user-adjustable threshold
 
 ---
 
 ## 2. INTENDED USE
 
-- **Target Population**: Adults aged 18–90 undergoing PERG functional testing.  
-- **Intended Environment**: Ophthalmology clinics, vision research centers.  
-- **End Users**: Ophthalmologists and qualified technicians.  
-- **Clinical Role**: Decision support (CDS); not intended for autonomous diagnosis.  
-- **Device Status**: Research-use only; not FDA-cleared.  
+- **Target Population**: Adults aged 18–90 undergoing PERG testing for functional assessment  
+- **Intended Use Setting**: Ophthalmology clinics and vision science laboratories  
+- **End Users**: Ophthalmologists, neuro-ophthalmologists, and trained technicians  
+- **Clinical Role**: Decision support only; not intended for autonomous diagnosis  
+- **Device Status**: Prototype under research; not FDA-cleared  
 
 ---
 
 ## 3. DATA & LABELING
 
-**Dataset**: PERG-IOBA Dataset (PhysioNet repository)  
-**Participants**:  
-- 304 unique individuals recruited between 2003–2022 at IOBA (Spain)  
-- Age: 4–86 years (mean: 37.1 ± 18.3)  
+**Dataset**: PERG-IOBA Dataset (publicly available via PhysioNet)  
+**Cohort Summary**:
+- 304 individual patients, collected between 2003 and 2022 at IOBA (Spain)  
+- Age: 4 to 86 years (mean ± SD: 37.1 ± 18.3)  
 - Sex: 155 female participants  
-- 23 individuals had repeated visits (total >304 records)  
-- 100 participants were clinically “Normal”  
+- Some participants underwent multiple visits  
+- 100 participants were labeled clinically “normal”  
 
-**Final Dataset for Modeling**:  
-- **242 usable PERG records** with valid RE_1 and LE_1 signals and complete clinical metadata  
-- **Signal Channels**: RE_1 and LE_1 (sampled at 300 Hz, microvolt resolution)  
-- **Metadata**: Age, sex, and diagnosis  
-- **Ground Truth**: Labels derived from expert-confirmed clinical tags in `metadata_clinical.csv`  
-- **Binary Labels**:  
-  - 1: Pathological (e.g., retinitis pigmentosa, Stargardt disease, optic neuropathy)  
-  - 0: Normal (no ocular pathology)
+**Final Modeling Dataset**:
+- 242 cleaned and complete records with valid RE_1 and LE_1 signals and metadata  
+- **Signals**: RE_1 and LE_1 (300 Hz sampling rate)  
+- **Metadata**: Age, sex, diagnosis  
+- **Ground Truth Labels**:  
+  - `1`: Pathological PERG (e.g., RP, Stargardt, optic neuropathy)  
+  - `0`: Normal PERG  
+- Labels derived from expert-reviewed metadata (`metadata_clinical.csv`)
 
 ---
 
 ## 4. MODELS EVALUATED
 
-**Classical ML Models**:
-- Logistic Regression
-- Decision Tree
-- Random Forest (**top-performing classical model**)
+**Machine Learning Models**:
+- Logistic Regression  
+- Decision Tree  
+- Random Forest (best balance of metrics)  
 - XGBoost  
 
-**Deep Learning Architecture**:
-- Fully connected feedforward neural network (Keras / TensorFlow)  
-- Input: Concatenated FFT-derived features (RE_1 + LE_1) + clinical metadata (age, sex)  
-- Design: Dense → BatchNorm → Dropout (3–4 layers total)  
-- Optimizer: Adam  
-- Loss: Binary Crossentropy  
-- Threshold tuning: ROC-based and F1-score maximization  
+**Deep Learning Model**:
+- Fully connected neural network (Keras/TensorFlow)  
+- Inputs: RE_1 + LE_1 FFT features + age + sex  
+- Architecture: Dense layers with BatchNorm and Dropout  
+- Optimizer: Adam – Loss: Binary Crossentropy  
+- Thresholds optimized for F1-score or sensitivity (≥ 0.90)
 
 ---
 
 ## 5. PERFORMANCE SUMMARY
 
-| Model Type         | AUC    | Recall | Specificity | F1-Score | Accuracy | Threshold     |
-|--------------------|--------|--------|-------------|----------|----------|---------------|
-| Random Forest (ML) | **0.768** | 0.70   | 0.70        | 0.69     | **0.71**   | 0.50 (default) |
-| Deep Learning       | 0.660  | **0.93** | 0.33        | **0.76** | 0.67     | 0.40 (F1-opt)  |
+| Model              | Threshold | Sensitivity | Specificity | F1-Score | Balanced Accuracy | AUC-ROC |
+|-------------------|-----------|-------------|-------------|----------|-------------------|---------|
+| **Random Forest**  | 0.440     | 0.864       | **0.545**   | 0.745    | **0.705**         | **0.768** |
+| XGBoost            | 0.061     | **1.000**   | 0.227       | 0.721    | 0.614             | 0.680   |
+| Logistic Regression| 0.2676    | 0.909       | 0.273       | 0.690    | 0.591             | 0.727   |
+| Decision Tree      | 0.500     | 0.364       | 0.545       | 0.400    | 0.455             | 0.455   |
 
 **Interpretation**:  
-- The **Random Forest** model exhibits balanced sensitivity/specificity and the highest AUC.  
-- The **Deep Learning** model achieves higher recall (sensitivity), making it preferable in screening settings where false negatives must be minimized, albeit with lower specificity.
+- **Random Forest** yields the best overall performance across AUC and balanced accuracy.  
+- **XGBoost** reaches perfect sensitivity but sacrifices specificity, potentially overfitting.  
+- **Logistic Regression** is more conservative but interpretable.  
+- **Decision Tree** underperforms in both classes and is not recommended.
 
 ---
 
 ## 6. GOOD MACHINE LEARNING PRACTICES (GMLP)
 
-- ✅ Stratified and balanced training/test splits  
-- ✅ Clear feature engineering (FFT statistics, patient demographics)  
-- ✅ Transparent model architecture with reproducible training settings  
-- ✅ ROC-based threshold optimization strategies  
-- ✅ Versioning via GitHub and code documentation  
-- ✅ Ground truth derived from expert-labeled clinical data  
+- ✅ Reproducible pipeline with stratified sampling  
+- ✅ Transparent feature extraction (FFT stats + metadata)  
+- ✅ Version-controlled codebase with GitHub traceability  
+- ✅ Use of grid search for threshold calibration  
+- ✅ Standardized metrics reporting  
+- ✅ Expert-reviewed labels as ground truth  
 
 ---
 
 ## 7. VALIDATION STRATEGY
 
-- **Data Partitioning**:  
-  - Stratified hold-out split (80/20) for training/validation  
-  - 50/50 class balance for fair metric interpretation  
-- **Threshold Evaluation**:  
-  - Multi-threshold grid search from 0.1 to 0.9  
-  - Selection based on F1-score or sensitivity constraint (TPR ≥ 0.90)  
-- **Metrics Computed**:  
-  - ROC-AUC  
+- **Data Split**:  
+  - Stratified 80/20 train-test split with 50/50 class balance  
+- **Threshold Selection**:  
+  - Grid search from 0.05 to 0.95 (step=0.01)  
+  - Selection based on F1-score or target sensitivity  
+- **Evaluation Metrics**:  
+  - ROC AUC  
   - Sensitivity, Specificity  
-  - Accuracy, F1-score  
-  - Confusion matrix + classification report  
+  - F1-score, Balanced Accuracy  
+  - Confusion Matrix  
 
 ---
 
 ## 8. RISK ANALYSIS (ISO 14971-Inspired)
 
-| Risk Type                          | Mitigation Strategy                                      |
-|-----------------------------------|-----------------------------------------------------------|
-| ❌ False Negatives (missed cases) | Threshold adjustment to ensure high recall (TPR ≥ 0.90)   |
-| ⚠️ False Positives (unwarranted concern) | Manual review required; specificity tracked           |
-| ⚠️ Dataset Bias                   | Stratified sampling; balanced evaluation                 |
-| ❌ Overfitting (small dataset)     | Dropout, early stopping, regularization, cross-validation |
+| Risk                                | Mitigation Strategy                                        |
+|-------------------------------------|-------------------------------------------------------------|
+| ❌ False Negatives (missed pathology)| Threshold tuning to ensure high sensitivity (TPR ≥ 0.90)    |
+| ⚠️ False Positives (unnecessary concern)| Flag for clinician review; specificity tracking         |
+| ⚠️ Dataset Bias                     | Stratified splits; class balance maintained                |
+| ❌ Overfitting Risk (small N)        | Dropout, regularization, and early stopping applied         |
 
 ---
 
 ## 9. LIMITATIONS
 
-- No external prospective validation (single-center retrospective dataset)  
-- Raw signal quality not uniformly pre-processed for noise/artifacts  
-- No integration with Electronic Health Records (EHRs)  
-- Model trained offline; real-time integration not yet implemented  
-- Ground truth limited to clinical labels; no genetic confirmation  
+- No external (prospective) validation yet conducted  
+- Dataset originates from a single institution  
+- Signal noise/artifacts not fully normalized  
+- No real-time hardware integration (offline analysis only)  
+- Labels based on clinical diagnosis without genetic confirmation  
 
 ---
 
 ## 10. FUTURE WORK
 
-- Engage FDA Q-Submission program for premarket feedback  
-- Conduct external validation on multi-institutional cohort  
-- Develop GUI or web-based CDS interface for clinicians  
-- Implement real-time signal acquisition API for hardware integration  
-- Explore advanced architectures (CNNs, attention mechanisms, LSTMs)
+- Engage with FDA via Q-Submission pathway  
+- Multi-site data collection for broader validation  
+- Deploy web-based GUI for point-of-care decision support  
+- Explore time-series models (CNN, LSTM, attention mechanisms)  
+- Integrate signal acquisition module for real-time evaluation  
 
 ---
 
 ## 11. DISCLAIMER
 
-This document simulates a pre-submission to the U.S. Food & Drug Administration (FDA) for **educational and research purposes only**.  
-The PERG Signal Classifier is **not an approved or cleared medical device** and must **not** be used for clinical decision-making.  
-All performance claims are based on retrospective evaluation using publicly available data from PhysioNet (PERG-IOBA).
+This document represents a **simulated FDA pre-submission** prepared for **educational and research purposes only**.  
+The PERG Signal Classifier is **not an FDA-cleared device** and must **not** be used in any clinical setting.  
+All results reported are based on retrospective data (PERG-IOBA dataset) publicly available via PhysioNet.
+
+---
 
