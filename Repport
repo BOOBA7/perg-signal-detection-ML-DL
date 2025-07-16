@@ -4,17 +4,17 @@
 
 This project simulates a real-world scenario in **clinical bioinformatics**: the automatic analysis of PERG signals to detect early abnormalities of the optic nerve or retina (e.g., glaucoma, neuropathies).
 
-The goal is to compare **Machine Learning (ML)** and **Deep Learning (DL)** models for use in **AI-assisted triage**.  
+The goal is to compare **Machine Learning (ML)** and **Deep Learning (DL)** models for use in **AI-assisted triage**.
 It relies on real electrophysiological data (open-source dataset) and follows best practices in traceability, reproducibility, cross-validation, and threshold selection.
 
 ---
 
 ## 🧪 Data Overview
 
-- **Source**: [PERG-IOBA – PhysioNet (2024)](https://physionet.org/content/perg-ioba-dataset/1.0.0/)
-- **Format**: 279 raw signals (RE_1, LE_1), sampled at 300 Hz + clinical metadata (age, sex, diagnosis)
-- **Ground truth**: Binary diagnostic labels confirmed by an ophthalmologist (label = 0/1)
-- **Distribution**: Pathological prevalence ≈ 2% (realistic, imbalanced)
+* **Source**: [PERG-IOBA – PhysioNet (2024)](https://physionet.org/content/perg-ioba-dataset/1.0.0/)
+* **Format**: 279 raw signals (RE\_1, LE\_1), sampled at 300 Hz + clinical metadata (age, sex, diagnosis)
+* **Ground truth**: Binary diagnostic labels confirmed by an ophthalmologist (label = 0/1)
+* **Distribution**: Pathological prevalence ≈ 2% (realistic, imbalanced)
 
 ---
 
@@ -22,67 +22,73 @@ It relies on real electrophysiological data (open-source dataset) and follows be
 
 Classical models use **manually engineered features**:
 
-- Basic statistics: mean, min, max, standard deviation  
-- Higher-order moments: skewness, kurtosis  
-- Frequency domain: FFT (average magnitude, max power, spectral energy)  
-- Metadata: encoded age and sex
+* Basic statistics: mean, min, max, standard deviation
+* Higher-order moments: skewness, kurtosis
+* Frequency domain: FFT (average magnitude, max power, spectral energy)
+* Metadata: encoded age and sex
 
 ---
 
 ## ⚙️ Modeling
 
 ### 🧠 Machine Learning:
-- Tested models: `Logistic Regression`, `Decision Tree`, `Random Forest`, `XGBoost`
-- Input: FFT + time-based features + metadata
-- Stratified 5-fold cross-validation
-- Test sets:
-  - ✅ **Balanced test set (50/50)**: robust evaluation
-  - ✅ **Real-world prevalence (~2%)**: realistic scenario simulation
+
+* Tested models: `Logistic Regression`, `Decision Tree`, `Random Forest`, `XGBoost`
+* Input: FFT + time-based features + metadata
+* Stratified 5-fold cross-validation
+* Test sets:
+
+  * ✅ **Balanced test set (50/50)**: robust evaluation
+  * ✅ **Real-world prevalence (\~2%)**: realistic scenario simulation
 
 ### 🤖 Deep Learning:
-- **Framework**: TensorFlow / Keras
-- **Architecture**: two-branch dense network with normalization
-  - **Input 1**: PERG FFT features (RE + LE)
-  - **Input 2**: Clinical metadata (age, sex)
-  - Processed separately → merged → dense → sigmoid output
-- **Optimization**:
-  - Loss: `binary_crossentropy`, metric: `AUC`
-  - Callbacks: EarlyStopping, ReduceLROnPlateau, TensorBoard
-- **Validation**: cross-validation + independent balanced test set
-- **Threshold selection** based on:
-  - 🎯 Target sensitivity ≥ 0.8
-  - 📊 Maximum F1-score
-  - 📈 Youden’s index
+
+* **Framework**: TensorFlow / Keras
+* **Architecture**: two-branch dense network with normalization
+
+  * **Input 1**: PERG FFT features (RE + LE)
+  * **Input 2**: Clinical metadata (age, sex)
+  * Processed separately → merged → dense → sigmoid output
+* **Optimization**:
+
+  * Loss: `binary_crossentropy`, metric: `AUC`
+  * Callbacks: EarlyStopping, ReduceLROnPlateau, TensorBoard
+* **Validation**: cross-validation + independent balanced test set
+* **Threshold selection** based on:
+
+  * 🎯 Target sensitivity ≥ 0.8
+  * 📊 Maximum F1-score
+  * 📈 Youden’s index
 
 ---
 
 ## 📈 Results (Balanced Test Set)
 
-| Model               | AUC     | Sensitivity | Specificity | F1-score | Accuracy | Threshold |
-|---------------------|---------|-------------|-------------|----------|----------|-----------|
-| 🔹 Random Forest     | **0.768** | 0.818       | 0.591       | 0.735    | **0.705** | 0.46      |
-| 🔸 Deep Learning     | 0.660   | **1.000**   | 0.048       | **0.737**| 0.592    | 0.40      |
+| Model            | AUC       | Sensitivity | Specificity | F1-score  | Accuracy  | Threshold |
+| ---------------- | --------- | ----------- | ----------- | --------- | --------- | --------- |
+| 🔹 Random Forest | **0.768** | 0.818       | 0.591       | 0.735     | **0.705** | 0.46      |
+| 🔸 Deep Learning | 0.660     | **1.000**   | 0.048       | **0.737** | 0.592     | 0.40      |
 
 ### 📊 DL Report (threshold = 0.40)
 
-- **Sensitivity (Recall)**: 100.0%
-- **Specificity**: 4.8%
-- **Accuracy**: 59.2%
-- **F1-score**: 0.7368
-- **Positive class precision**: 58%
+* **Sensitivity (Recall)**: 100.0%
+* **Specificity**: 4.8%
+* **Accuracy**: 59.2%
+* **F1-score**: 0.7368
+* **Positive class precision**: 58%
 
 ---
 
-## 🩺 Clinical Interpretation
+## 🧺 Clinical Interpretation
 
-| Metric                    | DL Model (RE/LE + metadata) | ML Model (Random Forest)     |
-|---------------------------|-----------------------------|-------------------------------|
-| 🔬 Sensitivity            | ✅ Excellent (no missed cases) | Good (0.818)                 |
-| 📉 Specificity            | ❌ Very low (many false positives) | Better (0.591)          |
-| 🧠 Interpretability       | Low (DL = black box)        | High (interpretable features) |
-| 🏥 Ideal Use Case         | Ultra-sensitive triage      | Balanced general screening    |
+| Metric              | DL Model (RE/LE + metadata)       | ML Model (Random Forest)      |
+| ------------------- | --------------------------------- | ----------------------------- |
+| 🔬 Sensitivity      | ✅ Excellent (no missed cases)     | Good (0.818)                  |
+| 📉 Specificity      | ❌ Very low (many false positives) | Better (0.591)                |
+| 🧠 Interpretability | Low (DL = black box)              | High (interpretable features) |
+| 🏥 Ideal Use Case   | Ultra-sensitive triage            | Balanced general screening    |
 
-➡️ The **DL model** is useful as a **high-recall pre-screening tool**, detecting all pathological cases at the expense of high false positives.  
+➡️ The **DL model** is useful as a **high-recall pre-screening tool**, detecting all pathological cases at the expense of high false positives.
 ➡️ The **RF model** provides a more **balanced and interpretable** approach for general-purpose diagnostics.
 
 ---
@@ -102,10 +108,11 @@ Threshold  Sensitivity  Specificity  F1-score   Accuracy
 0.55       0.3571       0.8095       0.4762     0.5510
 0.60       0.1071       0.9524       0.1875     0.4694
 0.65+      0.0000       1.0000       0.0000     0.4286
+```
 
+---
 
-
-✅ Bioinformatics Best Practices
+## ✅ Bioinformatics Best Practices
 
 | Practice                                 | Implemented |
 | ---------------------------------------- | ----------- |
@@ -117,46 +124,39 @@ Threshold  Sensitivity  Specificity  F1-score   Accuracy
 | 📁 Git versioning & training logs        | ✅           |
 | 📈 TensorBoard visualization             | ✅           |
 
+---
 
-⚠️ Limitations & Future Work
+## ⚠️ Limitations & Future Work
 
+* ❌ No external clinical validation
+* ❌ No real-time integration (EHR, PERG API)
+* ❌ Dataset limited in size and diversity
+* ❗ DL specificity remains low (risk of over-referral)
 
-❌ No external clinical validation
+---
 
-❌ No real-time integration (EHR, PERG API)
+## 🧭 Future directions:
 
-❌ Dataset limited in size and diversity
+* Multicenter prospective validation
+* Web interface or GUI integration
+* Training with sequential models (e.g. CNN, LSTM)
+* Signal quality control & artifact analysis
 
-❗ DL specificity remains low (risk of over-referral)
+---
 
+## 📁 References
 
+* PERG-IOBA – PhysioNet (2024)
+* FDA SaMD GMLP Guidelines (2021)
+* ISO 14971 – Risk Management in Medical Devices
+* Best Practices in ML for Biomedical Signal Analysis
 
-🧭 Future directions:
+---
 
+## 🚫 Disclaimer
 
-Multicenter prospective validation
-
-Web interface or GUI integration
-
-Training with sequential models (e.g. CNN, LSTM)
-
-Signal quality control & artifact analysis
-
-
-📁 References
-
-
-PERG-IOBA – PhysioNet (2024)
-
-FDA SaMD GMLP Guidelines (2021)
-
-ISO 14971 – Risk Management in Medical Devices
-
-Best Practices in ML for Biomedical Signal Analysis
-
-
-🛑 Disclaimer
 This repository is a simulated bioinformatics project for educational purposes only.
 It is not a certified medical device or diagnostic tool.
 All clinical decisions must be validated by qualified healthcare professionals.
+
 
