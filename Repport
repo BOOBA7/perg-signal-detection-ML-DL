@@ -39,7 +39,7 @@ Classical models use **manually engineered features**:
 * Test sets:
 
   * ✅ **Balanced test set (50/50)**: robust evaluation
-  * ✅ **Real-world prevalence (\~2%)**: realistic scenario simulation
+  * ✅ **Real-world prevalence (~2%)**: realistic scenario simulation
 
 ### 🤖 Deep Learning:
 
@@ -67,7 +67,7 @@ Classical models use **manually engineered features**:
 | Model            | AUC       | Sensitivity | Specificity | F1-score  | Accuracy  | Threshold |
 | ---------------- | --------- | ----------- | ----------- | --------- | --------- | --------- |
 | 🔹 Random Forest | **0.768** | 0.818       | 0.591       | 0.735     | **0.705** | 0.46      |
-| 🔸 Deep Learning | 0.660     | **1.000**   | 0.048       | **0.737** | 0.592     | 0.40      |
+| 🔸 Deep Learning | 0.740     | **1.000**   | 0.048       | **0.737** | 0.592     | 0.40      |
 
 ### 📊 DL Report (threshold = 0.40)
 
@@ -88,7 +88,7 @@ Classical models use **manually engineered features**:
 | 🧠 Interpretability | Low (DL = black box)              | High (interpretable features) |
 | 🏥 Ideal Use Case   | Ultra-sensitive triage            | Balanced general screening    |
 
-➡️ The **DL model** is useful as a **high-recall pre-screening tool**, detecting all pathological cases at the expense of high false positives.
+➡️ The **DL model** is useful as a **high-recall pre-screening tool**, detecting all pathological cases at the expense of high false positives.  
 ➡️ The **RF model** provides a more **balanced and interpretable** approach for general-purpose diagnostics.
 
 ---
@@ -108,9 +108,7 @@ Threshold  Sensitivity  Specificity  F1-score   Accuracy
 0.55       0.3571       0.8095       0.4762     0.5510
 0.60       0.1071       0.9524       0.1875     0.4694
 0.65+      0.0000       1.0000       0.0000     0.4286
-```
 
----
 
 ## ✅ Bioinformatics Best Practices
 
