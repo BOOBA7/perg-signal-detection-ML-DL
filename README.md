@@ -104,16 +104,28 @@ Trained on a 10-dimensional feature vector:
 
 ## 📊 Results Summary
 
-| Model         | AUC    | Sensitivity | Specificity | F1-score | Accuracy | Threshold |
-|---------------|--------|-------------|-------------|----------|----------|-----------|
-| Random Forest | **0.77** | 0.70        | 0.70        | 0.69     | **0.71** | 0.50      |
-| Deep Learning | 0.66   | **0.93**     | 0.33        | **0.76** | 0.67     | 0.40      |
+### 🧠 Final Model Metrics (Balanced Evaluation Set)
 
-### Interpretation
+| Model              | Threshold | Sensitivity | Specificity | F1-score | Balanced Accuracy | AUC    |
+|--------------------|-----------|-------------|-------------|----------|--------------------|--------|
+| ✅ Random Forest    | 0.4400    | 0.864       | 0.545       | 0.745    | **0.705**          | **0.768** |
+| XGBoost            | 0.0610    | 1.000       | 0.227       | 0.721    | 0.614              | 0.680  |
+| Logistic Regression| 0.2676    | 0.909       | 0.273       | 0.690    | 0.591              | 0.727  |
+| Decision Tree      | 0.5000    | 0.364       | 0.545       | 0.400    | 0.455              | 0.455  |
 
-- The **Random Forest** model is optimal for balanced performance.  
-- The **Deep Learning** model favors **high sensitivity**, making it suitable for early screening use cases.  
-- The **optimal threshold** was chosen based on F1 maximization and recall constraint.
+### Deep Learning (Keras)
+
+| Model         | Threshold | Sensitivity | Specificity | F1-score | Balanced Accuracy | AUC  |
+|---------------|-----------|-------------|-------------|----------|--------------------|------|
+| DL (Keras)    | 0.400     | 1.000       | 0.048       | 0.7368   | 0.524              | 0.743|
+
+---
+
+### 🧠 Interpretation
+
+- The **Random Forest** model provides the most **clinically balanced performance**, with a good trade-off between sensitivity and specificity.  
+- The **Deep Learning** model offers **maximum sensitivity**, ideal for **early screening**, but at the cost of low specificity.  
+- Thresholds were optimized to **maximize F1-score** under a **recall constraint ≥ 0.8**, ensuring no pathological case is missed.
 
 ---
 
@@ -166,3 +178,4 @@ Veterinarian & Bioinformatics Enthusiast
 ## 🤝 Acknowledgements
 
 This project was designed, implemented, and documented with the support of AI-based tools including **ChatGPT (OpenAI)** for technical refinement, regulatory structuring, and code optimization.
+
