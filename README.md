@@ -66,7 +66,7 @@ Trained on a 10-dimensional feature vector:
 
 - Logistic Regression  
 - Decision Tree  
-- Random Forest ✅ **Best performance (AUC ≈ 0.77)**  
+- Random Forest ✅ **Best performance (AUC ≈ 0.768)**  
 - XGBoost  
 
 ### Evaluation Methodology
@@ -123,9 +123,9 @@ Trained on a 10-dimensional feature vector:
 
 ### 🧠 Interpretation
 
-- The **Random Forest** model provides the most **clinically balanced performance**, with a good trade-off between sensitivity and specificity.  
-- The **Deep Learning** model offers **maximum sensitivity**, ideal for **early screening**, but at the cost of low specificity.  
-- Thresholds were optimized to **maximize F1-score** under a **recall constraint ≥ 0.8**, ensuring no pathological case is missed.
+- The **Random Forest** model offers the best overall **balance** between sensitivity and specificity, with an AUC of **0.768** and F1-score of **0.745**.  
+- The **Deep Learning** model achieved **perfect sensitivity** (1.000), which is ideal for screening use cases, but with **very low specificity** (0.048), leading to high false positive rates.  
+- All models were evaluated with a **recall constraint ≥ 0.8**, prioritizing the detection of all pathological cases, even at the cost of specificity.
 
 ---
 
@@ -178,4 +178,5 @@ Veterinarian & Bioinformatics Enthusiast
 ## 🤝 Acknowledgements
 
 This project was designed, implemented, and documented with the support of AI-based tools including **ChatGPT (OpenAI)** for technical refinement, regulatory structuring, and code optimization.
+
 
